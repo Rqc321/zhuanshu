@@ -1,0 +1,22 @@
+{
+  "name": "novel-writing-platform",
+  "version": "1.0.0",
+  "description": "一个模仿番茄作家的小说创作平台，支持在线写作和阅读",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "install-deps": "npm install"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "body-parser": "^1.20.2"
+  },
+  "author": "作者大大",
+  "license": "MIT",
+  "keywords": [
+    "小说创作",
+    "写作平台",
+    "在线阅读"
+  ]
+}

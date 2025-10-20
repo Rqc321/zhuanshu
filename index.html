@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的小说创作平台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#ff6b3b',
+                        secondary: '#2a9d8f',
+                        dark: '#264653',
+                        light: '#f8f9fa',
+                        muted: '#6c757d'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        serif: ['Georgia', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .transition-all-300 {
+                transition: all 300ms ease-in-out;
+            }
+            .editor-focus {
+                @apply focus:ring-2 focus:ring-primary/50 focus:border-primary;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <!-- 顶部导航 -->
+    <nav id="main-nav" class="bg-white shadow-sm fixed w-full z-50 transition-all duration-300">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <i class="fa fa-book text-primary text-2xl"></i>
+                <span class="text-xl font-bold text-dark">创作者空间</span>
+            </div>
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="#dashboard" class="text-dark hover:text-primary transition-colors">仪表盘</a>
+                <a href="#novels" class="text-dark hover:text-primary transition-colors">我的小说</a>
+                <a href="#writing" class="text-dark hover:text-primary transition-colors">创作中心</a>
+                <a href="#statistics" class="text-dark hover:text-primary transition-colors">数据统计</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-100">
+                    <i class="fa fa-moon-o text-dark"></i>
+                </button>
+                <div class="relative">
+                    <button id="user-menu-button" class="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-100">
+                        <img src="https://picsum.photos/32/32" alt="用户头像" class="w-8 h-8 rounded-full object-cover">
+                        <span class="hidden md:inline text-sm font-medium">作者大大</span>
+                    </button>
+                </div>
+                <button id="mobile-menu-button" class="md:hidden p-2 rounded-md hover:bg-gray-100">
+                    <i class="fa fa-bars text-dark"></i>
+                </button>
+            </div>
+        </div>
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+            <div class="container mx-auto px-4 py-2">
+                <a href="#dashboard" class="block py-2 text-dark hover:text-primary">仪表盘</a>
+                <a href="#novels" class="block py-2 text-dark hover:text-primary">我的小说</a>
+                <a href="#writing" class="block py-2 text-dark hover:text-primary">创作中心</a>
+                <a href="#statistics" class="block py-2 text-dark hover:text-primary">数据统计</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="flex-grow pt-16">
+        <!-- 英雄区域 -->
+        <section class="bg-gradient-to-r from-primary/10 to-secondary/10 py-16">
+            <div class="container mx-auto px-4">
+                <div class="max-w-3xl mx-auto text-center">
+                    <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold text-dark mb-4 leading-tight">
+                        释放你的创作潜能
+                    </h1>
+                    <p class="text-lg text-muted mb-8">
+                        简单、高效的写作平台，让你的故事栩栩如生
+                    </p>
+                    <div class="flex flex-col sm:flex-row justify-center gap-4">
+                        <button id="start-writing-btn" class="bg-primary hover:bg-primary/90 text-white font-medium py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1">
+                            <i class="fa fa-pencil mr-2"></i>开始创作
+                        </button>
+                        <button id="view-stats-btn" class="bg-white hover:bg-gray-50 text-dark font-medium py-3 px-8 rounded-lg border border-gray-200 shadow hover:shadow-md transition-all">
+                            <i class="fa fa-bar-chart mr-2"></i>查看数据
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 仪表盘区域 -->
+        <section id="dashboard" class="py-12 bg-white">
+            <div class="container mx-auto px-4">
+                <h2 class="text-2xl font-bold text-dark mb-8">创作仪表盘</h2>
+                
+                <!-- 统计卡片 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-light p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <p class="text-muted text-sm">今日码字</p>
+                                <h3 class="text-3xl font-bold text-dark mt-1">2,345</h3>
+                                <p class="text-green-500 text-sm mt-2">
+                                    <i class="fa fa-arrow-up mr-1"></i>12.5% 较昨日
+                                </p>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                                <i class="fa fa-file-text-o text-primary text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-light p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <p class="text-muted text-sm">本月总字数</p>
+                                <h3 class="text-3xl font-bold text-dark mt-1">56,789</h3>
+                                <p class="text-green-500 text-sm mt-2">
+                                    <i class="fa fa-arrow-up mr-1"></i>8.3% 较上月
+                                </p>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center">
+                                <i class="fa fa-calendar-check-o text-secondary text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-light p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <p class="text-muted text-sm">总阅读量</p>
+                                <h3 class="text-3xl font-bold text-dark mt-1">12,345</h3>
+                                <p class="text-green-500 text-sm mt-2">
+                                    <i class="fa fa-arrow-up mr-1"></i>15.2% 较上周
+                                </p>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-dark/10 flex items-center justify-center">
+                                <i class="fa fa-eye text-dark text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 写作统计图表 -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="font-semibold text-dark">每日码字统计</h3>
+                            <div class="text-sm text-muted">过去7天</div>
+                        </div>
+                        <div class="h-80">
+                            <canvas id="writingChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="font-semibold text-dark">小说进度</h3>
+                            <div class="text-sm text-muted">按字数</div>
+                        </div>
+                        <div class="space-y-6">
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm font-medium">御兽都市</span>
+                                    <span class="text-sm text-muted">56%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-primary h-2 rounded-full" style="width: 56%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm font-medium">秘境探险</span>
+                                    <span class="text-sm text-muted">32%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-secondary h-2 rounded-full" style="width: 32%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm font-medium">御兽大赛</span>
+                                    <span class="text-sm text-muted">18%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-dark h-2 rounded-full" style="width: 18%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 我的小说 -->
+        <section id="novels" class="py-12 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-2xl font-bold text-dark">我的小说</h2>
+                    <button class="bg-primary hover:bg-primary/90 text-white font-medium py-2 px-6 rounded-lg shadow hover:shadow-md transition-all">
+                        <i class="fa fa-plus mr-2"></i>新建小说
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- 小说卡片 1 -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all">
+                        <div class="h-48 bg-gradient-to-r from-primary/20 to-secondary/20 relative">
+                            <img src="https://picsum.photos/400/300" alt="御兽都市" class="w-full h-full object-cover">
+                            <div class="absolute top-3 right-3 bg-primary text-white text-xs font-bold px-2 py-1 rounded">
+                                连载中
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="font-bold text-lg text-dark mb-2">御兽都市</h3>
+                            <p class="text-muted text-sm mb-4 line-clamp-2">
+                                在这个御兽与人类共存的世界，主角林辰意外获得了神秘的龙形契约徽章，开启了他的传奇御兽师之路...
+                            </p>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-muted">字数: 125,432</span>
+                                <div class="flex space-x-3">
+                                    <button class="text-primary hover:text-primary/80 transition-colors">
+                                        <i class="fa fa-edit mr-1"></i>编辑
+                                    </button>
+                                    <button class="text-secondary hover:text-secondary/80 transition-colors">
+                                        <i class="fa fa-eye mr-1"></i>预览
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 小说卡片 2 -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all">
+                        <div class="h-48 bg-gradient-to-r from-primary/20 to-secondary/20 relative">
+                            <img src="https://picsum.photos/401/300" alt="秘境探险" class="w-full h-full object-cover">
+                            <div class="absolute top-3 right-3 bg-secondary text-white text-xs font-bold px-2 py-1 rounded">
+                                存稿中
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="font-bold text-lg text-dark mb-2">秘境探险</h3>
+                            <p class="text-muted text-sm mb-4 line-clamp-2">
+                                一支由各领域顶尖御兽师组成的探险队，深入古老秘境寻找传说中的御兽传承...
+                            </p>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-muted">字数: 45,789</span>
+                                <div class="flex space-x-3">
+                                    <button class="text-primary hover:text-primary/80 transition-colors">
+                                        <i class="fa fa-edit mr-1"></i>编辑
+                                    </button>
+                                    <button class="text-secondary hover:text-secondary/80 transition-colors">
+                                        <i class="fa fa-eye mr-1"></i>预览
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 小说卡片 3 -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all">
+                        <div class="h-48 bg-gradient-to-r from-primary/20 to-secondary/20 relative">
+                            <img src="https://picsum.photos/402/300" alt="御兽大赛" class="w-full h-full object-cover">
+                            <div class="absolute top-3 right-3 bg-muted text-white text-xs font-bold px-2 py-1 rounded">
+                                构思中
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="font-bold text-lg text-dark mb-2">御兽大赛</h3>
+                            <p class="text-muted text-sm mb-4 line-clamp-2">
+                                四年一届的全球御兽师大赛即将开始，各国顶尖御兽师齐聚一堂，展开巅峰对决...
+                            </p>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-muted">字数: 12,345</span>
+                                <div class="flex space-x-3">
+                                    <button class="text-primary hover:text-primary/80 transition-colors">
+                                        <i class="fa fa-edit mr-1"></i>编辑
+                                    </button>
+                                    <button class="text-secondary hover:text-secondary/80 transition-colors">
+                                        <i class="fa fa-eye mr-1"></i>预览
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 创作中心 -->
+        <section id="writing" class="py-12 bg-white">
+            <div class="container mx-auto px-4">
+                <h2 class="text-2xl font-bold text-dark mb-8">创作中心</h2>
+                
+                <div class="flex flex-col lg:flex-row gap-6">
+                    <!-- 侧边栏 -->
+                    <div class="lg:w-1/4 bg-light p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="font-semibold text-dark mb-4">御兽都市</h3>
+                        
+                        <div class="mb-6">
+                            <p class="text-sm text-muted mb-2">当前章节</p>
+                            <select class="w-full p-2 border border-gray-300 rounded-lg bg-white text-sm">
+                                <option>第1章 神秘徽章</option>
+                                <option>第2章 觉醒仪式</option>
+                                <option selected>第3章 初次契约</option>
+                                <option>第4章 校园生活</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <p class="text-sm text-muted mb-2">章节列表</p>
+                            <div class="space-y-1 max-h-60 overflow-y-auto pr-2">
+                                <button class="w-full text-left p-2 text-sm hover:bg-gray-100 rounded">
+                                    第1章 神秘徽章
+                                </button>
+                                <button class="w-full text-left p-2 text-sm hover:bg-gray-100 rounded">
+                                    第2章 觉醒仪式
+                                </button>
+                                <button class="w-full text-left p-2 text-sm bg-primary/10 text-primary rounded font-medium">
+                                    第3章 初次契约
+                                </button>
+                                <button class="w-full text-left p-2 text-sm hover:bg-gray-100 rounded">
+                                    第4章 校园生活
+                                </button>
+                                <button class="w-full text-left p-2 text-sm hover:bg-gray-100 rounded">
+                                    第5章 秘境入口
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <button class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg shadow hover:shadow-md transition-all mb-3">
+                            <i class="fa fa-plus mr-2"></i>新建章节
+                        </button>
+                        <button class="w-full bg-white hover:bg-gray-50 text-dark font-medium py-2 px-4 rounded-lg border border-gray-200 shadow hover:shadow-sm transition-all">
+                            <i class="fa fa-list-ul mr-2"></i>章节管理
+                        </button>
+                    </div>
+                    
+                    <!-- 编辑器 -->
+                    <div class="lg:w-3/4">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
+                            <div class="mb-4">
+                                <input type="text" value="第3章 初次契约" class="w-full p-3 text-xl font-bold border-none focus:ring-0 focus:outline-none editor-focus">
+                            </div>
+                            <div class="mb-4">
+                                <!-- 工具栏 -->
+                                <div class="flex flex-wrap items-center gap-2 p-3 bg-light rounded-lg mb-4">
+                                    <button class="p-2 hover:bg-gray-200 rounded" title="加粗">
+                                        <i class="fa fa-bold"></i>
+                                    </button>
+                                    <button class="p-2 hover:bg-gray-200 rounded" title="斜体">
+                                        <i class="fa fa-italic"></i>
+                                    </button>
+                                    <button class="p-2 hover:bg-gray-200 rounded" title="下划线">
+                                        <i class="fa fa-underline"></i>
+                                    </button>
+                                    <span class="h-5 w-px bg-gray-300 mx-1"></span>
+                                    <button class="p-2 hover:bg-gray-200 rounded" title="段落">
+                                        <i class="fa fa-paragraph"></i>
+                                    </button>
+                                    <button class="p-2 hover:bg-gray-200 rounded" title="标题">
+                                        <i class="fa fa-header"></i>
+                                    </button>
+                                    <span class="h-5 w-px bg-gray-300 mx-1"></span>
+                                    <button class="p-2 hover:bg-gray-200 rounded" title="列表">
+                                        <i class="fa fa-list-ul"></i>
+                                    </button>
+                                    <button class="p-2 hover:bg-gray-200 rounded" title="有序列表">
+                                        <i class="fa fa-list-ol"></i>
+                                    </button>
+                                    <span class="h-5 w-px bg-gray-300 mx-1"></span>
+                                    <button class="p-2 hover:bg-gray-200 rounded" title="插入图片">
+                                        <i class="fa fa-image"></i>
+                                    </button>
+                                    <button class="p-2 hover:bg-gray-200 rounded" title="插入链接">
+                                        <i class="fa fa-link"></i>
+                                    </button>
+                                    <span class="h-5 w-px bg-gray-300 mx-1"></span>
+                                    <button class="p-2 hover:bg-gray-200 rounded" title="清除格式">
+                                        <i class="fa fa-eraser"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- 编辑区域 -->
+                                <div class="min-h-[500px] p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all" contenteditable="true">
+                                    <p>清晨的阳光透过窗户洒在房间里，林辰从床上爬起来，伸手摸向床头柜上的龙形徽章。这枚徽章是父母失踪前留给他的唯一物品，最近几天总是在深夜发出微弱的光芒。</p>
+                                    <p><br></p>
+                                    <p>今天是觉醒仪式的日子，所有年满16岁的高中生都将在学校的御兽师协会分会进行觉醒，测试精神力天赋并尝试契约第一只御兽。林辰穿上校服，将徽章小心地挂在脖子上，对着镜子露出自信的笑容。</p>
+                                    <p><br></p>
+                                    <p>「林辰，该走了！」苏清月的声音从楼下传来。作为青梅竹马，两人从小一起长大，今天也要一起参加觉醒仪式。</p>
+                                    <p><br></p>
+                                    <p>「来了！」林辰抓起书包，飞快地冲下楼。</p>
+                                    <p><br></p>
+                                    <p>青藤市第三中学的操场上已经聚集了不少学生，大家都兴奋地讨论着即将到来的觉醒仪式。林辰和苏清月找了个位置站定，等待仪式开始。</p>
+                                    <p><br></p>
+                                    <p>「你紧张吗？」苏清月轻声问道，她的手中紧握着一个小盒子，里面装着她家族传承的契约道具。</p>
+                                    <p><br></p>
+                                    <p>「有一点，但更多的是期待。」林辰摸了摸胸口的徽章，感觉到它传来一丝温暖。</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 底部操作栏 -->
+                        <div class="flex flex-wrap justify-between items-center gap-4">
+                            <div class="flex items-center space-x-4">
+                                <div class="text-sm text-muted">
+                                    <i class="fa fa-file-text-o mr-1"></i>字数统计: 528
+                                </div>
+                                <div class="text-sm text-muted">
+                                    <i class="fa fa-clock-o mr-1"></i>写作时长: 25分钟
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <button class="bg-white hover:bg-gray-50 text-dark font-medium py-2 px-6 rounded-lg border border-gray-200 shadow hover:shadow-sm transition-all">
+                                    <i class="fa fa-save mr-2"></i>自动保存中
+                                </button>
+                                <button class="bg-primary hover:bg-primary/90 text-white font-medium py-2 px-6 rounded-lg shadow hover:shadow-md transition-all">
+                                    <i class="fa fa-check mr-2"></i>完成编辑
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 阅读界面预览 -->
+        <section id="reading-preview" class="py-12 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <h2 class="text-2xl font-bold text-dark mb-8">读者阅读界面</h2>
+                
+                <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+                    <!-- 小说标题 -->
+                    <div class="text-center mb-8">
+                        <h1 class="text-3xl font-bold text-dark mb-2">御兽都市</h1>
+                        <p class="text-muted">第3章 初次契约</p>
+                    </div>
+                    
+                    <!-- 阅读内容 -->
+                    <div class="prose max-w-none text-dark leading-relaxed">
+                        <p>清晨的阳光透过窗户洒在房间里，林辰从床上爬起来，伸手摸向床头柜上的龙形徽章。这枚徽章是父母失踪前留给他的唯一物品，最近几天总是在深夜发出微弱的光芒。</p>
+                        <p>今天是觉醒仪式的日子，所有年满16岁的高中生都将在学校的御兽师协会分会进行觉醒，测试精神力天赋并尝试契约第一只御兽。林辰穿上校服，将徽章小心地挂在脖子上，对着镜子露出自信的笑容。</p>
+                        <p>「林辰，该走了！」苏清月的声音从楼下传来。作为青梅竹马，两人从小一起长大，今天也要一起参加觉醒仪式。</p>
+                        <p>「来了！」林辰抓起书包，飞快地冲下楼。</p>
+                        <p>青藤市第三中学的操场上已经聚集了不少学生，大家都兴奋地讨论着即将到来的觉醒仪式。林辰和苏清月找了个位置站定，等待仪式开始。</p>
+                        <p>「你紧张吗？」苏清月轻声问道，她的手中紧握着一个小盒子，里面装着她家族传承的契约道具。</p>
+                        <p>「有一点，但更多的是期待。」林辰摸了摸胸口的徽章，感觉到它传来一丝温暖。</p>
+                        <p>就在这时，操场前方的高台上传来一阵掌声。青藤三中的校长，同时也是一名黄金级御兽师，走上了讲台。他的身后跟着几名御兽师协会的工作人员，每个人的身上都散发出强大的气息。</p>
+                        <p>「同学们，欢迎参加今天的觉醒仪式！」校长的声音充满了感染力，「今天，你们将迈出成为御兽师的第一步。记住，无论天赋如何，真正的强大来自于不懈的努力和与御兽的羁绊！」</p>
+                        <p>台下响起热烈的掌声，林辰也跟着鼓掌，心中充满了期待。</p>
+                        <p>觉醒仪式开始了，学生们按照班级顺序依次上台。林辰和苏清月在高三（1）班，所以排在比较后面。他们看着前面的同学一个个上台，有的兴奋，有的紧张，有的甚至因为精神力测试不合格而哭泣。</p>
+                    </div>
+                    
+                    <!-- 阅读导航 -->
+                    <div class="mt-8 pt-6 border-t border-gray-200 flex justify-between items-center">
+                        <button class="text-muted hover:text-primary transition-colors">
+                            <i class="fa fa-angle-left mr-2"></i>上一章
+                        </button>
+                        <div class="flex items-center space-x-4">
+                            <button class="text-muted hover:text-primary transition-colors">
+                                <i class="fa fa-bookmark-o"></i>
+                            </button>
+                            <button class="text-muted hover:text-primary transition-colors">
+                                <i class="fa fa-cog"></i>
+                            </button>
+                            <button class="text-muted hover:text-primary transition-colors">
+                                <i class="fa fa-share-alt"></i>
+                            </button>
+                        </div>
+                        <button class="text-muted hover:text-primary transition-colors">
+                            下一章<i class="fa fa-angle-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <i class="fa fa-book text-primary text-2xl"></i>
+                        <span class="text-xl font-bold">创作者空间</span>
+                    </div>
+                    <p class="text-gray-400 text-sm">
+                        专为小说创作者打造的写作平台，让创作更简单，让阅读更愉悦。
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">快速链接</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#dashboard" class="text-gray-400 hover:text-white transition-colors">仪表盘</a></li>
+                        <li><a href="#novels" class="text-gray-400 hover:text-white transition-colors">我的小说</a></li>
+                        <li><a href="#writing" class="text-gray-400 hover:text-white transition-colors">创作中心</a></li>
+                        <li><a href="#statistics" class="text-gray-400 hover:text-white transition-colors">数据统计</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">支持</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">帮助中心</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">常见问题</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">联系我们</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">隐私政策</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">关注我们</h3>
+                    <div class="flex space-x-4 mb-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center hover:bg-primary transition-colors">
+                            <i class="fa fa-weibo"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center hover:bg-primary transition-colors">
+                            <i class="fa fa-wechat"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center hover:bg-primary transition-colors">
+                            <i class="fa fa-qq"></i>
+                        </a>
+                    </div>
+                    <p class="text-gray-400 text-sm">
+                        订阅我们的公众号获取最新动态
+                    </p>
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-gray-700 text-center text-gray-400 text-sm">
+                <p>&copy; 2025 创作者空间. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 登录模态框 -->
+    <div id="login-modal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 transform transition-all">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-dark">创作者登录</h3>
+                    <button id="close-modal" class="text-muted hover:text-dark">
+                        <i class="fa fa-times text-xl"></i>
+                    </button>
+                </div>
+                <form>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-muted mb-2">用户名</label>
+                        <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all" placeholder="请输入用户名">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-muted mb-2">密码</label>
+                        <input type="password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all" placeholder="请输入密码">
+                    </div>
+                    <button type="submit" class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 px-4 rounded-lg shadow hover:shadow-md transition-all mb-4">
+                        登录
+                    </button>
+                    <div class="text-center text-sm text-muted">
+                        <p>只有创作者可以编辑内容，其他用户只能阅读</p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化图表
+        document.addEventListener('DOMContentLoaded', function() {
+            // 写作统计图表
+            const ctx = document.getElementById('writingChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+                    datasets: [{
+                        label: '码字数量',
+                        data: [1250, 1800, 2100, 1500, 2500, 2345, 0],
+                        borderColor: '#ff6b3b',
+                        backgroundColor: 'rgba(255, 107, 59, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 移动端菜单切换
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // 导航栏滚动效果
+            const nav = document.getElementById('main-nav');
+            
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 10) {
+                    nav.classList.add('shadow');
+                    nav.classList.remove('shadow-sm');
+                } else {
+                    nav.classList.remove('shadow');
+                    nav.classList.add('shadow-sm');
+                }
+            });
+
+            // 编辑按钮点击显示登录模态框
+            const editButtons = document.querySelectorAll('button:has(.fa-edit)');
+            const loginModal = document.getElementById('login-modal');
+            const closeModal = document.getElementById('close-modal');
+            
+            editButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    // 只有作者可以编辑，这里简化为点击编辑按钮显示登录框
+                    loginModal.classList.remove('hidden');
+                    e.preventDefault();
+                });
+            });
+
+            closeModal.addEventListener('click', function() {
+                loginModal.classList.add('hidden');
+            });
+
+            // 点击模态框外部关闭
+            loginModal.addEventListener('click', function(e) {
+                if (e.target === loginModal) {
+                    loginModal.classList.add('hidden');
+                }
+            });
+
+            // 平滑滚动
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                    
+                    // 关闭移动端菜单
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
